@@ -78,6 +78,23 @@ function titleCase(s) {
   }).join('');
 }
 
+// Preprint servers, by DOI prefix, host name or venue name.
+const PREPRINT_DOI = /^10\.(1101|64898|48550|21203|2139|20944|26434|31219|31234|22541|32942|36227)\//; // bioRxiv/medRxiv, bioRxiv (new), arXiv, Research Square, SSRN, Preprints.org, ChemRxiv, OSF, PsyArXiv, Authorea, EcoEvoRxiv, TechRxiv
+const PREPRINT_HOST = /(biorxiv|medrxiv|arxiv|researchsquare|ssrn|preprints\.org|chemrxiv|osf\.io|authorea|techrxiv)/i;
+const PREPRINT_VENUE = /\b(biorxiv|medrxiv|arxiv|research square|ssrn|preprints?|chemrxiv|psyarxiv|techrxiv)\b/i;
+function preprintServer(doi, url, venue) {
+  const hay = `${doi} ${url} ${venue}`;
+  if (/biorxiv|10\.64898\//i.test(hay)) return 'bioRxiv';
+  if (/medrxiv/i.test(hay)) return 'medRxiv';
+  if (/^10\.1101\//.test(doi)) return 'bioRxiv';
+  if (/arxiv|10\.48550\//i.test(hay)) return 'arXiv';
+  if (/researchsquare|research square|10\.21203\//i.test(hay)) return 'Research Square';
+  if (/ssrn|10\.2139\//i.test(hay)) return 'SSRN';
+  if (/chemrxiv|10\.26434\//i.test(hay)) return 'ChemRxiv';
+  if (PREPRINT_DOI.test(doi) || PREPRINT_HOST.test(url) || PREPRINT_VENUE.test(venue)) return 'preprint';
+  return '';
+}
+
 function normTitle(t) {
   return clean(t).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 }
@@ -251,6 +268,9 @@ async function fetchIris(m) {
     const inPress = !yearNum || yearNum > new Date().getFullYear() + 1;
     const title = clean(f.title, 400);
     if (!title) continue;
+    const doi = safeDoi(f.doi), url = safeUrl(f.url);
+    const venue = titleCase(clean(f.journal || f.booktitle || f.publisher || '', 300));
+    const preprint = preprintServer(doi, url, venue);
     pubs.push({
       id: handle,
       source: 'iris',
@@ -258,13 +278,14 @@ async function fetchIris(m) {
       authors: f.author ? authorsFromBib(f.author) : [],
       year: inPress ? null : yearNum,
       inPress,
-      type: TYPE_MAP[e.type] || 'other',
-      venue: titleCase(clean(f.journal || f.booktitle || f.publisher || '', 300)),
+      type: preprint ? 'preprint' : TYPE_MAP[e.type] || 'other',
+      preprint,
+      venue: preprint && !venue ? preprint : venue,
       volume: clean(f.volume, 20),
       number: clean(f.number, 20),
       pages: clean(f.pages, 30),
-      doi: safeDoi(f.doi),
-      url: safeUrl(f.url),
+      doi,
+      url,
       iris: `${base}/handle/${handle}`,
       oa: Boolean(oa[handle]),
       bibtex: bibtexFor(e, handle),
@@ -293,13 +314,17 @@ async function fetchOrcid(m) {
     if (!s) continue;
     const ids = s['external-ids']?.['external-id'] || [];
     const doi = safeDoi(ids.find((x) => x['external-id-type'] === 'doi')?.['external-id-value']);
+    const url = safeUrl(s.url?.value || (doi ? `https://doi.org/${doi}` : ''));
+    const venue = clean(s['journal-title']?.value, 300);
+    const preprint = s.type === 'preprint' ? (preprintServer(doi, url, venue) || 'preprint') : preprintServer(doi, url, venue);
     works.push({
       title: clean(s.title?.title?.value, 400),
       year: parseInt(s['publication-date']?.year?.value, 10) || null,
-      type: ({ 'journal-article': 'journal', 'conference-paper': 'conference', 'book-chapter': 'chapter', book: 'book' })[s.type] || 'other',
-      venue: clean(s['journal-title']?.value, 300),
+      type: preprint ? 'preprint' : ({ 'journal-article': 'journal', 'conference-paper': 'conference', 'book-chapter': 'chapter', book: 'book' })[s.type] || 'other',
+      preprint,
+      venue: preprint && !venue ? preprint : venue,
       doi,
-      url: safeUrl(s.url?.value || (doi ? `https://doi.org/${doi}` : '')),
+      url,
     });
   }
   return works;

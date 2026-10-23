@@ -21,7 +21,8 @@ export type Pub = {
   authors: string[];
   year: number | null;
   inPress: boolean;
-  type: 'journal' | 'conference' | 'chapter' | 'book' | 'patent' | 'other';
+  type: 'journal' | 'conference' | 'chapter' | 'book' | 'patent' | 'preprint' | 'other';
+  preprint: string; // '' or the server name: bioRxiv, medRxiv, arXiv, …
   venue: string;
   volume: string;
   number: string;
@@ -40,8 +41,14 @@ export const typeLabel: Record<Pub['type'], string> = {
   chapter: 'chapter',
   book: 'book',
   patent: 'patent',
+  preprint: 'preprint',
   other: 'other',
 };
+
+/** Attributes that make a link to another site open in a new tab. */
+export function ext(url: string): Record<string, string> {
+  return /^https?:\/\//.test(url) ? { target: '_blank', rel: 'noopener' } : {};
+}
 
 /** "A. Benso, G. Politano et al." style author line. */
 export function authorLine(authors: string[], max = 6): string {

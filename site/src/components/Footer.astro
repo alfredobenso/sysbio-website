@@ -25,9 +25,9 @@ const synced = new Date(meta.fetchedAt).toLocaleDateString('en-GB', { day: 'nume
         <div class="col">
           <strong class="h">Elsewhere</strong>
           {people.map((p) => (
-            <a href={p.polito?.url ?? `https://www.polito.it/en/staff?p=${p.slug}`} rel="noopener">{p.name} on polito.it</a>
+            <a href={p.polito?.url ?? `https://www.polito.it/en/staff?p=${p.slug}`} target="_blank" rel="noopener">{p.name} on polito.it</a>
           ))}
-          <a href="https://iris.polito.it/" rel="noopener">Porto@Iris repository</a>
+          <a href="https://iris.polito.it/" target="_blank" rel="noopener">Porto@Iris repository</a>
           <a href={href('/publications/')}>All publications</a>
         </div>
       </div>

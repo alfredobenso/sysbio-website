@@ -63,7 +63,7 @@ const alumni = [
               </a>
             )}
             {Object.entries(p.links).filter(([, u]) => u).map(([k, u]) => (
-              <a class="small" href={u} rel="noopener">{linkLabel[k] ?? k}</a>
+              <a class="small" href={u} target="_blank" rel="noopener">{linkLabel[k] ?? k}</a>
             ))}
             <a class="small" href={href(`/publications/?who=${p.id}`)}>{p.pubCount} publications</a>
           </div>

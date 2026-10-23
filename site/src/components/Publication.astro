@@ -1,5 +1,5 @@
 ---
-import { authorLine, venueLine, typeLabel, type Pub } from '../lib/site';
+import { authorLine, venueLine, typeLabel, ext, type Pub } from '../lib/site';
 
 interface Props { pub: Pub; people: { slug: string; short: string }[] }
 const { pub, people } = Astro.props;
@@ -16,7 +16,7 @@ const linkLabel = pub.doi ? 'DOI' : pub.iris ? 'IRIS record' : 'Link';
   data-text={searchText}
 >
   <div class="side">
-    <span class="chip bg-cyan">{yearLabel}</span>
+    <span class:list={['chip', pub.preprint ? 'bg-yellow' : 'bg-cyan']}>{yearLabel}</span>
     <span class="mono muted">{typeLabel[pub.type]}</span>
   </div>
   <div class="body">
@@ -25,8 +25,9 @@ const linkLabel = pub.doi ? 'DOI' : pub.iris ? 'IRIS record' : 'Link';
       {authorLine(pub.authors)}{pub.authors.length && pub.venue ? ' · ' : ''}<em>{venueLine(pub)}</em>
     </p>
     <div class="actions">
-      {link && <a class="small" href={link} rel="noopener">{linkLabel}</a>}
-      {pub.iris && pub.doi && <a class="small" href={pub.iris} rel="noopener">IRIS</a>}
+      {pub.preprint && <span class="small pre" title="Preprint: not peer-reviewed">{pub.preprint === 'preprint' ? 'preprint' : `preprint · ${pub.preprint}`}</span>}
+      {link && <a class="small" href={link} {...ext(link)}>{linkLabel}</a>}
+      {pub.iris && pub.doi && <a class="small" href={pub.iris} {...ext(pub.iris)}>IRIS</a>}
       {pub.oa && <span class="small oa">open access</span>}
       {pub.bibtex && (
         <button type="button" class="small copy" data-bibtex={pub.bibtex}>
@@ -48,6 +49,8 @@ const linkLabel = pub.doi ? 'DOI' : pub.iris ? 'IRIS record' : 'Link';
   .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding-top: 2px; }
   .oa { background: var(--lime); cursor: default; }
   .oa:hover { background: var(--lime); color: var(--ink); }
+  .pre { background: var(--yellow); cursor: default; }
+  .pre:hover { background: var(--yellow); color: var(--ink); }
   .via { padding-left: 4px; }
   @media (max-width: 640px) { .pub { flex-direction: column; gap: 10px; } .side { flex-direction: row; align-items: center; } }
 </style>

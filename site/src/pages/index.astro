@@ -5,7 +5,7 @@ import Publication from '../components/Publication.astro';
 import people from '../data/people.json';
 import publications from '../data/publications.json';
 import meta from '../data/meta.json';
-import { href, type Pub } from '../lib/site';
+import { href, ext, type Pub } from '../lib/site';
 
 const recent = (await getCollection('recent')).sort((a, b) => a.data.order - b.data.order);
 const recentRendered = await Promise.all(recent.map(async (r) => ({ ...r, Content: (await render(r)).Content })));
@@ -104,7 +104,7 @@ const areas = [
           </div>
           <h3>{r.data.title}</h3>
           <div class="prose"><r.Content /></div>
-          <a href={href(r.data.link)} class="more" rel={r.data.link.startsWith('http') ? 'noopener' : undefined}>{r.data.linkLabel}</a>
+          <a href={href(r.data.link)} class="more" {...ext(r.data.link)}>{r.data.linkLabel}</a>
         </article>
       ))}
     </div>

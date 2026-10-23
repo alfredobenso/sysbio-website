@@ -69,7 +69,7 @@ const span = (s: number, e: number | null) => (e === null ? `${s} –` : s === e
             {p.data.acronym && p.data.title.length > 70 && <p class="sub">{p.data.title}</p>}
             <div class="prose"><p.Content /></div>
             {p.data.partners.length > 0 && <p class="partners"><span class="mono">partners</span> {p.data.partners.join(' · ')}</p>}
-            {p.data.website && <a href={p.data.website} class="small" rel="noopener">Project website</a>}
+            {p.data.website && <a href={p.data.website} class="small" target="_blank" rel="noopener">Project website</a>}
           </div>
         </article>
       ))}
@@ -102,8 +102,8 @@ const span = (s: number, e: number | null) => (e === null ? `${s} –` : s === e
             <h3>{t.data.title}</h3>
             <p class="desc">{t.data.summary}</p>
             <div class="actions">
-              {t.data.paper && <a class="small" href={t.data.paper} rel="noopener">Paper</a>}
-              {t.data.website && <a class="small" href={t.data.website} rel="noopener">Website</a>}
+              {t.data.paper && <a class="small" href={t.data.paper} target="_blank" rel="noopener">Paper</a>}
+              {t.data.website && <a class="small" href={t.data.website} target="_blank" rel="noopener">Website</a>}
             </div>
             <details class="cite">
               <summary>How to cite</summary>

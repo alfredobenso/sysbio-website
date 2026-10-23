@@ -16,7 +16,7 @@ const max = Math.max(...counts.values());
 const allYears = Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i);
 // bar heights as one of 12 steps, so no inline style is needed (CSP)
 const step = (n: number) => (n ? Math.max(1, Math.round((n / max) * 12)) : 0);
-const types = ['journal', 'conference', 'chapter', 'book', 'other'] as const;
+const types = ['journal', 'conference', 'chapter', 'book', 'preprint', 'other'] as const;
 const synced = new Date(meta.fetchedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 ---
 <Base title="Publications" description={`All ${meta.publications} publications of the SysBio Group, read nightly from Porto@Iris, Politecnico di Torino's open repository. Search, filter by author and year, copy BibTeX.`} current="/publications/" accent="cyan">
@@ -72,7 +72,7 @@ const synced = new Date(meta.fetchedAt).toLocaleDateString('en-GB', { day: 'nume
       <span id="count" class="count">{pubs.length} of {pubs.length} publications</span>
       <div class="pills">
         <button type="button" class="small" id="clear">Clear filters</button>
-        <a class="small" href={people[0]?.iris ?? 'https://iris.polito.it'} rel="noopener">Browse on IRIS</a>
+        <a class="small" href={people[0]?.iris ?? 'https://iris.polito.it'} target="_blank" rel="noopener">Browse on IRIS</a>
       </div>
     </div>
   </section>
