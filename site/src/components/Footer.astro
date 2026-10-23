@@ -1,0 +1,54 @@
+---
+import people from '../data/people.json';
+import meta from '../data/meta.json';
+import { href } from '../lib/site';
+
+interface Props { full?: boolean }
+const { full = false } = Astro.props;
+const synced = new Date(meta.fetchedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+---
+<footer id="contact" class:list={['footer', { full }]}>
+  <div class="wrap">
+    {full && (
+      <div class="cols">
+        <div class="col">
+          <strong class="h">Work with us</strong>
+          <p>We supervise MSc theses and PhD projects in bioinformatics, systems biology and AI for health, and we bring the computational side to wet-lab and clinical partners. Write to either of us.</p>
+          {people.map((p) => p.polito?.email && (
+            <a class="mail" href={`mailto:${p.polito.email}`}>{p.polito.email}</a>
+          ))}
+        </div>
+        <div class="col">
+          <strong class="h">Where</strong>
+          <p>Dipartimento di Automatica e Informatica (DAUIN)<br />Politecnico di Torino<br />Corso Duca degli Abruzzi 24<br />10129 Torino, Italy</p>
+        </div>
+        <div class="col">
+          <strong class="h">Elsewhere</strong>
+          {people.map((p) => (
+            <a href={p.polito?.url ?? `https://www.polito.it/en/staff?p=${p.slug}`} rel="noopener">{p.name} on polito.it</a>
+          ))}
+          <a href="https://iris.polito.it/" rel="noopener">Porto@Iris repository</a>
+          <a href={href('/publications/')}>All publications</a>
+        </div>
+      </div>
+    )}
+    <div class="bottom mono">
+      <span>SysBio Group · Politecnico di Torino</span>
+      <span>Publication data from IRIS, synced {synced}</span>
+      <span>Static site · no cookies · no trackers · no login</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer { background: var(--ink); color: #fff; padding: 32px 0; }
+  .footer.full { padding-top: 64px; }
+  .cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; margin-bottom: 48px; }
+  .col { display: flex; flex-direction: column; gap: 12px; color: var(--line); line-height: 1.55; }
+  .h { color: #fff; font: 700 26px/1.1 var(--display); letter-spacing: -0.02em; }
+  .col a { color: #fff; }
+  .col a:hover { color: var(--lime); }
+  .mail { color: var(--lime) !important; font-weight: 600; }
+  .bottom { display: flex; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; color: var(--faint); }
+  @media (max-width: 800px) { .cols { grid-template-columns: minmax(0, 1fr); gap: 28px; } }
+</style>

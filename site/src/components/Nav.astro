@@ -1,0 +1,46 @@
+---
+import Logo from './Logo.astro';
+import { href, nav } from '../lib/site';
+
+interface Props { current?: string; accent?: string }
+const { current = '', accent = '' } = Astro.props;
+---
+<div class="topband">
+  <div class="wrap mono">
+    <span>Politecnico di Torino · DAUIN · System Biology Group</span>
+    <span class="hide-sm">Static site · no cookies · no trackers</span>
+  </div>
+</div>
+<nav class="wrap nav" aria-label="Main">
+  <a href={href('/')} class="brand">
+    <Logo />
+    <span>SysBio</span>
+  </a>
+  <div class="links">
+    {nav.map((item) => (
+      <a
+        href={href(item.path)}
+        class:list={[{ current: current === item.path, [`bg-${accent}`]: current === item.path && accent }]}
+        aria-current={current === item.path ? 'page' : undefined}
+      >{item.label}</a>
+    ))}
+    <a href={href('/#contact')} class="btn btn-violet contact">Contact</a>
+  </div>
+</nav>
+
+<style>
+  .topband { background: var(--ink); color: #fff; padding: 8px 0; }
+  .topband .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-top: 20px; padding-bottom: 20px; }
+  .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; font: 700 26px/1 var(--display); letter-spacing: -0.02em; }
+  .links { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+  .links a:not(.btn) { font: 500 16px/1 var(--body); text-decoration: none; padding: 12px 14px; border-radius: 999px; }
+  .links a:not(.btn):hover { background: var(--ink); color: #fff; }
+  .links a.current:not([class*='bg-']) { background: var(--violet-soft); }
+  .contact { min-height: 44px; margin-left: 8px; }
+  @media (max-width: 640px) {
+    .hide-sm { display: none; }
+    .links a:not(.btn) { padding: 10px 10px; font-size: 15px; }
+    .contact { margin-left: 0; }
+  }
+</style>

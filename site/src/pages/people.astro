@@ -1,0 +1,116 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import peopleData from '../data/people.json';
+import meta from '../data/meta.json';
+import { href } from '../lib/site';
+
+const entries = (await getCollection('people')).sort((a, b) => a.data.order - b.data.order);
+const people = await Promise.all(entries.map(async (e) => {
+  const live = peopleData.find((p) => p.slug === e.id);
+  const { Content } = await render(e);
+  const links: Record<string, string> = {
+    'polito.it': live?.polito?.url ?? `https://www.polito.it/en/staff?p=${e.id}`,
+    'Porto@Iris': live?.iris ?? '',
+    ...(live?.polito?.links ?? {}),
+    ...e.data.links,
+  };
+  return { ...e, Content, live, links, pubCount: (meta.byMember as Record<string, number>)[e.id] ?? 0 };
+}));
+
+const linkLabel: Record<string, string> = { orcid: 'ORCID', scopus: 'Scopus', google_scholar: 'Google Scholar', researchgate: 'ResearchGate', linkedin: 'LinkedIn', dblp: 'dblp' };
+
+const alumni = [
+  ['Stefano Di Carlo', 'co-author on theRING, CyTransfinder, ReNE, PPL Finder'],
+  ['Alessandro Savino', 'regulatory network models, protein function prediction'],
+  ['Roberta Bardini', 'multi-level models, BiSDL, co-inventor of two patents'],
+  ['Hafeez Ur Rehman', 'PhD · PFP pipeline, protein function prediction'],
+  ['Alessandro Vasciaveo', 'PhD · BNToolkit, Boolean network simulation'],
+  ['Massimo Natale', 'FunMOD, protein–protein network modules'],
+];
+---
+<Base title="People" description="The people of the SysBio Group at Politecnico di Torino: Alfredo Benso and Gianfranco Politano, with alumni and collaborators." current="/people/" accent="coral">
+  <header class="page-head bg-coral">
+    <div class="wrap">
+      <div>
+        <h1>People</h1>
+        <p>Two faculty members, one shared obsession: turning biological data into models you can reason about. We are small on purpose and work through collaborations.</p>
+      </div>
+      <span class="chip">roles, keywords &amp; links synced from polito.it</span>
+    </div>
+  </header>
+
+  <section class="wrap faculty" aria-label="Faculty">
+    {people.map((p) => (
+      <article class="card person" id={p.id}>
+        <img src={href(p.data.photo)} alt={`Portrait of ${p.data.name}`} width="220" height="260" class:list={['photo', `shadow-${p.data.accent}`]} loading="lazy" />
+        <div class="info">
+          <div>
+            <h2>{p.data.name}</h2>
+            <p class="role">{p.live?.polito?.role ? `${p.live.polito.role.replace(/\s*\(L\. ?240\)/, '')} · ${p.live.polito.department.replace(/.*\((\w+)\)/, '$1')}${p.live.polito.center ? ` · ${p.live.polito.center.replace(/ - .*/, '')}` : ''}` : p.data.title}</p>
+          </div>
+          <div class="prose"><p.Content /></div>
+          {p.live?.polito?.keywords?.length ? (
+            <ul class="kw" aria-label="Research keywords">
+              {p.live.polito.keywords.map((k) => <li class:list={['chip', `bg-${p.data.accent}-soft`]}>{k.toLowerCase()}</li>)}
+            </ul>
+          ) : null}
+          <div class="links">
+            {p.live?.polito?.email && (
+              <a class="small" href={`mailto:${p.live.polito.email}`}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 7l9 6 9-6" /></svg>
+                {p.live.polito.email}
+              </a>
+            )}
+            {Object.entries(p.links).filter(([, u]) => u).map(([k, u]) => (
+              <a class="small" href={u} rel="noopener">{linkLabel[k] ?? k}</a>
+            ))}
+            <a class="small" href={href(`/publications/?who=${p.id}`)}>{p.pubCount} publications</a>
+          </div>
+        </div>
+      </article>
+    ))}
+  </section>
+
+  <section class="wrap section" aria-labelledby="alumni-h">
+    <div class="section-head">
+      <h2 id="alumni-h">Alumni &amp; long-time collaborators</h2>
+    </div>
+    <ul class="grid-3 alumni">
+      {alumni.map(([name, what]) => (
+        <li class="tile"><strong>{name}</strong><br /><span class="muted">{what}</span></li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="wrap section">
+    <div class="tile bg-yellow join">
+      <div>
+        <h2>Looking for a collaborator in computational biology?</h2>
+        <p>We bring the computational side to wet-lab and clinical partners: data integration, network models, and machine learning that is honest about its uncertainty. Joint papers, grant proposals and student exchanges all welcome.</p>
+      </div>
+      <a href="#contact" class="btn btn-ink">Start a conversation</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .faculty { padding-top: 64px; padding-bottom: 80px; display: flex; flex-direction: column; gap: 40px; }
+  .person { display: flex; flex-wrap: wrap; gap: 36px; padding: 32px; }
+  .photo { width: 220px; height: 260px; object-fit: cover; object-position: top; border: 2px solid var(--ink); border-radius: var(--radius); flex: 0 0 auto; }
+  .shadow-violet { box-shadow: 6px 6px 0 var(--violet); }
+  .shadow-cyan { box-shadow: 6px 6px 0 var(--cyan); }
+  .shadow-coral { box-shadow: 6px 6px 0 var(--coral); }
+  .info { flex: 1 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+  h2 { font-size: 38px; }
+  .role { font-size: 17px; font-weight: 600; margin-top: 6px; }
+  .kw { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; }
+  .links { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 4px; }
+  .alumni { list-style: none; margin: 0; padding: 0; gap: 16px; }
+  .alumni .tile { padding: 18px 20px; font-size: 14px; }
+  .alumni strong { font-size: 16px; }
+  .join { padding: 40px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 8px; }
+  .join h2 { font-size: 32px; line-height: 1.1; margin-bottom: 10px; }
+  .join div { max-width: 640px; }
+  @media (max-width: 640px) { .person { padding: 20px; } .join { padding: 24px; } h2 { font-size: 30px; } }
+</style>

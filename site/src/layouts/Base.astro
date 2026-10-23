@@ -1,0 +1,62 @@
+---
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { href } from '../lib/site';
+
+interface Props {
+  title: string;
+  description: string;
+  current?: string;
+  accent?: string;
+  fullFooter?: boolean;
+}
+const { title, description, current, accent, fullFooter = false } = Astro.props;
+const fullTitle = title === 'SysBio Group' ? 'SysBio Group · Politecnico di Torino' : `${title} · SysBio Group`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+
+// Content-Security-Policy as a meta tag so it also applies on hosts that
+// cannot set response headers (GitHub Pages). public/_headers carries the
+// same policy, plus frame-ancestors, for hosts that can.
+const csp = [
+  "default-src 'none'",
+  "script-src 'self'",
+  "style-src 'self'",
+  "img-src 'self' data:",
+  "font-src 'self'",
+  "connect-src 'self'",
+  "base-uri 'none'",
+  "form-action 'none'",
+].join('; ');
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Content-Security-Policy" content={csp} />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href={href('/favicon.svg')} type="image/svg+xml" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta name="color-scheme" content="light" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <Nav current={current} accent={accent} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer full={fullFooter} />
+  </body>
+</html>
+
+<style>
+  .skip { position: absolute; left: -999px; top: 8px; background: var(--yellow); padding: 10px 14px; border: 2px solid var(--ink); border-radius: 8px; z-index: 10; }
+  .skip:focus { left: 8px; }
+</style>

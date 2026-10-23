@@ -1,0 +1,159 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import people from '../data/people.json';
+import { href } from '../lib/site';
+
+const all = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order || b.data.start - a.data.start);
+const projects = await Promise.all(all.map(async (p) => ({ ...p, Content: (await render(p)).Content })));
+const ongoing = projects.filter((p) => p.data.status === 'ongoing');
+const completed = projects.filter((p) => p.data.status === 'completed');
+const tools = await Promise.all((await getCollection('tools')).sort((a, b) => a.data.order - b.data.order).map(async (t) => ({ ...t, Content: (await render(t)).Content })));
+const toolYears = tools.map((t) => t.data.year);
+
+// Grants on the polito.it profiles that are not described above (older or minor ones).
+const known = new Set(projects.flatMap((p) => [p.data.acronym, p.data.title].filter(Boolean).map((s) => s!.toLowerCase())));
+const other = people.flatMap((m) => (m.polito?.projects ?? []).map((pr) => ({ ...pr, who: m.short })))
+  .filter((pr) => !known.has((pr.acronym || '').toLowerCase()) && !known.has(pr.title.toLowerCase()))
+  .sort((a, b) => (b.start ?? 0) - (a.start ?? 0));
+
+const span = (s: number, e: number | null) => (e === null ? `${s} –` : s === e ? `${s}` : `${s} – ${e}`);
+---
+<Base title="Projects & Tools" description="Funded research projects of the SysBio Group at Politecnico di Torino and the open software we released: theRING, CyTransfinder, ReNE, FunMOD, BNToolkit and more." current="/projects/" accent="yellow">
+  <header class="page-head bg-yellow">
+    <div class="wrap">
+      <div>
+        <h1>Projects &amp; Tools</h1>
+        <p>Funded projects we have taken part in, and the software we released along the way. Most of it is open and still used.</p>
+      </div>
+      <div class="jump">
+        <a href="#projects" class="btn">Projects</a>
+        <a href="#tools" class="btn btn-lime">Tools</a>
+      </div>
+    </div>
+  </header>
+
+  {ongoing.length > 0 && (
+    <section id="projects" class="wrap ongoing" aria-labelledby="ongoing-h">
+      <h2 id="ongoing-h" class="h2">Ongoing</h2>
+      {ongoing.map((p) => (
+        <article class="card lift bg-violet-soft feature" id={p.id}>
+          <div class="side">
+            <span class="chip bg-violet">ongoing</span>
+            <span class="mono">{p.data.funder}</span>
+          </div>
+          <div class="body">
+            <h3>{p.data.title}</h3>
+            <div class="prose"><p.Content /></div>
+            {p.data.tags.length > 0 && <ul class="tags">{p.data.tags.map((t) => <li class="chip">{t}</li>)}</ul>}
+          </div>
+        </article>
+      ))}
+    </section>
+  )}
+
+  <section class="wrap section completed" aria-labelledby="past-h" id={ongoing.length ? undefined : 'projects'}>
+    <div class="section-head">
+      <h2 id="past-h">Completed</h2>
+      <span class="mono">grants listed on our polito.it profiles</span>
+    </div>
+    <div class="list">
+      {completed.map((p) => (
+        <article class="proj" id={p.id}>
+          <div class="side">
+            <span class="chip bg-yellow">{span(p.data.start, p.data.end)}</span>
+            <span class="mono muted">{p.data.funder}</span>
+          </div>
+          <div class="body">
+            <h3>{p.data.acronym ? `${p.data.acronym} · ` : ''}{p.data.acronym && p.data.title.length > 70 ? '' : p.data.title}</h3>
+            {p.data.acronym && p.data.title.length > 70 && <p class="sub">{p.data.title}</p>}
+            <div class="prose"><p.Content /></div>
+            {p.data.partners.length > 0 && <p class="partners"><span class="mono">partners</span> {p.data.partners.join(' · ')}</p>}
+            {p.data.website && <a href={p.data.website} class="small" rel="noopener">Project website</a>}
+          </div>
+        </article>
+      ))}
+    </div>
+    {other.length > 0 && (
+      <details class="other">
+        <summary>Earlier grants on our polito.it profiles ({other.length})</summary>
+        <ul>
+          {other.map((pr) => (
+            <li><span class="mono">{pr.start}{pr.end && pr.end !== pr.start ? `–${pr.end}` : ''}</span> {pr.acronym ? `${pr.acronym} · ` : ''}{pr.title} <span class="muted">· {pr.funding || pr.kind} · {pr.who}</span></li>
+          ))}
+        </ul>
+      </details>
+    )}
+  </section>
+
+  <section id="tools" class="bg-lime toolsec" aria-labelledby="tools-h">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <h2 id="tools-h">Tools &amp; databases</h2>
+          <p class="lead">Free for research use. Each one has a paper to cite; the BibTeX is right there.</p>
+        </div>
+        <span class="chip">{tools.length} tools · {Math.min(...toolYears)} – {Math.max(...toolYears)}</span>
+      </div>
+      <div class="grid-3">
+        {tools.map((t) => (
+          <article class="card lift tool" id={t.id}>
+            <span class:list={['chip', { 'bg-yellow': t.data.platform.includes('database') }]}>{t.data.platform} · {t.data.year}</span>
+            <h3>{t.data.title}</h3>
+            <p class="desc">{t.data.summary}</p>
+            <div class="actions">
+              {t.data.paper && <a class="small" href={t.data.paper} rel="noopener">Paper</a>}
+              {t.data.website && <a class="small" href={t.data.website} rel="noopener">Website</a>}
+            </div>
+            <details class="cite">
+              <summary>How to cite</summary>
+              <div class="prose"><t.Content /></div>
+            </details>
+          </article>
+        ))}
+        <div class="tile dashed">
+          <strong>New tools go here</strong>
+          <span>Adding one is a single Markdown file in the repository. No database, no admin panel to break into.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .jump { display: flex; gap: 10px; flex-wrap: wrap; }
+  .h2 { font-size: clamp(32px, 4vw, 40px); margin-bottom: 24px; }
+  .ongoing { padding-top: 64px; padding-bottom: 40px; }
+  .feature { padding: 32px; display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start; }
+  .feature .side { flex: 0 0 180px; display: flex; flex-direction: column; gap: 8px; }
+  .feature .side .chip { align-self: flex-start; color: #fff; }
+  .feature .body { flex: 1 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+  .feature h3 { font-size: 28px; line-height: 1.15; letter-spacing: -0.02em; }
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; }
+  .completed { padding-top: 24px; }
+  .list { border-bottom: 2px solid var(--ink); }
+  .proj { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 28px; padding: 28px 0; border-top: 2px solid var(--ink); }
+  .proj .side { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+  .proj .body { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .proj h3 { font-size: 24px; line-height: 1.2; }
+  .sub { font-weight: 600; }
+  .partners { font-size: 14px; color: var(--muted); }
+  .partners .mono { margin-right: 6px; }
+  .other { margin-top: 24px; }
+  .other summary { cursor: pointer; font-weight: 600; }
+  .other ul { margin: 12px 0 0; padding-left: 20px; line-height: 1.6; font-size: 15px; }
+  .other .mono { margin-right: 6px; }
+  .toolsec { border-top: 2px solid var(--ink); padding: 72px 0 96px; }
+  .lead { font-size: 17px; margin-top: 10px; max-width: 640px; }
+  .tool { padding: 24px; display: flex; flex-direction: column; gap: 12px; }
+  .tool .chip { align-self: flex-start; }
+  .tool h3 { font-size: 26px; line-height: 1.1; }
+  .tool .desc { font-size: 15px; line-height: 1.5; flex: 1 1 auto; }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .cite summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+  .cite .prose { margin-top: 10px; }
+  .dashed { padding: 24px; display: flex; flex-direction: column; justify-content: center; gap: 10px; border-style: dashed; box-shadow: none; }
+  .dashed strong { font: 700 20px/1.2 var(--display); }
+  .dashed span { font-size: 15px; line-height: 1.5; }
+  @media (max-width: 760px) { .proj { grid-template-columns: minmax(0, 1fr); gap: 12px; } .feature { padding: 24px; } }
+</style>

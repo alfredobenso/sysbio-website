@@ -1,0 +1,13 @@
+{
+  "fetchedAt": "2026-10-23T09:36:03.468Z",
+  "publications": 200,
+  "byMember": {
+    "alfredo-benso": 162,
+    "gianfranco-politano": 103
+  },
+  "sources": {
+    "iris": "https://iris.polito.it",
+    "polito": "https://www.polito.it/en/staff",
+    "orcid": "https://orcid.org"
+  }
+}

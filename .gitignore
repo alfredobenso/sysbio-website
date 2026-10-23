@@ -1,0 +1,4 @@
+# WordPress mirror of the old site: reference only, never deployed
+www.sysbio.polito.it/
+.DS_Store
+.claude/settings.local.json

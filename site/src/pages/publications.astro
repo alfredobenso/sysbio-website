@@ -1,0 +1,182 @@
+---
+import Base from '../layouts/Base.astro';
+import Publication from '../components/Publication.astro';
+import people from '../data/people.json';
+import publications from '../data/publications.json';
+import meta from '../data/meta.json';
+import type { Pub } from '../lib/site';
+
+const pubs = publications as Pub[];
+const shortPeople = people.map((p) => ({ slug: p.slug, short: p.short }));
+const years = [...new Set(pubs.map((p) => p.year).filter((y): y is number => !!y))].sort();
+const minYear = years[0], maxYear = years[years.length - 1];
+const counts = new Map<number, number>();
+for (const p of pubs) if (p.year) counts.set(p.year, (counts.get(p.year) ?? 0) + 1);
+const max = Math.max(...counts.values());
+const allYears = Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i);
+// bar heights as one of 12 steps, so no inline style is needed (CSP)
+const step = (n: number) => (n ? Math.max(1, Math.round((n / max) * 12)) : 0);
+const types = ['journal', 'conference', 'chapter', 'book', 'other'] as const;
+const synced = new Date(meta.fetchedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+<Base title="Publications" description={`All ${meta.publications} publications of the SysBio Group, read nightly from Porto@Iris, Politecnico di Torino's open repository. Search, filter by author and year, copy BibTeX.`} current="/publications/" accent="cyan">
+  <header class="page-head bg-cyan">
+    <div class="wrap">
+      <div>
+        <h1>Publications</h1>
+        <p>Everything we publish lands in Porto@Iris, Politecnico's open repository. This page is rebuilt from it every night, so it is never out of date and nobody has to maintain a list by hand.</p>
+      </div>
+      <div class="src">
+        <span class="chip">source: Porto@Iris · cross-checked with ORCID</span>
+        <span class="mono">last sync: {synced}</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="wrap controls" aria-label="Filters">
+    <div class="row">
+      <label for="q" class="visually-hidden">Search titles, authors and venues</label>
+      <input id="q" type="search" placeholder="Search titles, authors, venues…" autocomplete="off" />
+      <div role="group" aria-label="Filter by author" class="pills">
+        <button type="button" class="pill is-on" data-who="all" aria-pressed="true">Everyone</button>
+        {people.map((p) => <button type="button" class="pill" data-who={p.slug} aria-pressed="false">{p.short}</button>)}
+      </div>
+      <label class="typesel">
+        <span class="visually-hidden">Publication type</span>
+        <select id="type">
+          <option value="all">All types</option>
+          {types.map((t) => <option value={t}>{t}</option>)}
+        </select>
+      </label>
+    </div>
+
+    <div class="card chart">
+      <div class="chart-head">
+        <strong>Papers per year</strong>
+        <span id="year-hint" class="muted">Click a bar to filter by year</span>
+      </div>
+      <div class="bars" role="group" aria-label="Filter by year">
+        {allYears.map((y) => (
+          <button type="button" class:list={['bar', `h${step(counts.get(y) ?? 0)}`]} data-year={y} aria-pressed="false" aria-label={`${y}: ${counts.get(y) ?? 0} papers`} title={`${y}: ${counts.get(y) ?? 0}`}></button>
+        ))}
+      </div>
+      <div class="axis mono">
+        {allYears.map((y) => <span>{String(y).slice(2)}</span>)}
+      </div>
+    </div>
+
+    <div class="row between">
+      <span id="count" class="count">{pubs.length} of {pubs.length} publications</span>
+      <div class="pills">
+        <button type="button" class="small" id="clear">Clear filters</button>
+        <a class="small" href={people[0]?.iris ?? 'https://iris.polito.it'} rel="noopener">Browse on IRIS</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap listwrap" aria-label="Publication list">
+    <ul id="pubs" class="publist">
+      {pubs.map((p) => <Publication pub={p} people={shortPeople} />)}
+    </ul>
+    <p id="empty" class="empty" hidden>Nothing matches. <button type="button" class="small" data-clear>Clear filters</button></p>
+  </section>
+</Base>
+
+<script>
+  // Client-side filtering over the server-rendered list. Works without JS too
+  // (the full list is in the HTML); JS only hides what does not match.
+  const items = Array.from(document.querySelectorAll<HTMLLIElement>('#pubs .pub'));
+  const q = document.getElementById('q') as HTMLInputElement;
+  const typeSel = document.getElementById('type') as HTMLSelectElement;
+  const whoBtns = Array.from(document.querySelectorAll<HTMLButtonElement>('.pill[data-who]'));
+  const yearBtns = Array.from(document.querySelectorAll<HTMLButtonElement>('.bar[data-year]'));
+  const count = document.getElementById('count')!;
+  const empty = document.getElementById('empty')!;
+  const hint = document.getElementById('year-hint')!;
+  const names: Record<string, string> = {};
+  whoBtns.forEach((b) => (names[b.dataset.who!] = b.textContent!.trim()));
+
+  const state = { who: 'all', year: '', type: 'all', q: '' };
+  const params = new URLSearchParams(location.search);
+  if (params.get('who') && names[params.get('who')!]) state.who = params.get('who')!;
+
+  function apply() {
+    const needle = state.q.trim().toLowerCase();
+    let shown = 0;
+    for (const li of items) {
+      const ok =
+        (state.who === 'all' || (li.dataset.members ?? '').split(' ').includes(state.who)) &&
+        (!state.year || li.dataset.year === state.year) &&
+        (state.type === 'all' || li.dataset.type === state.type) &&
+        (!needle || (li.dataset.text ?? '').includes(needle));
+      li.hidden = !ok;
+      if (ok) shown++;
+    }
+    whoBtns.forEach((b) => { const on = b.dataset.who === state.who; b.classList.toggle('is-on', on); b.setAttribute('aria-pressed', String(on)); });
+    yearBtns.forEach((b) => { const on = b.dataset.year === state.year; b.classList.toggle('is-on', on); b.setAttribute('aria-pressed', String(on)); });
+    typeSel.value = state.type;
+    q.value = state.q;
+    hint.textContent = state.year ? `Showing ${state.year} · click the bar again to clear` : 'Click a bar to filter by year';
+    count.textContent = `${shown} of ${items.length} publications${state.who !== 'all' ? ` by ${names[state.who]}` : ''}`;
+    empty.hidden = shown > 0;
+    const url = new URL(location.href);
+    state.who === 'all' ? url.searchParams.delete('who') : url.searchParams.set('who', state.who);
+    history.replaceState(null, '', url);
+  }
+
+  q.addEventListener('input', () => { state.q = q.value; apply(); });
+  typeSel.addEventListener('change', () => { state.type = typeSel.value; apply(); });
+  whoBtns.forEach((b) => b.addEventListener('click', () => { state.who = b.dataset.who!; apply(); }));
+  yearBtns.forEach((b) => b.addEventListener('click', () => { state.year = state.year === b.dataset.year ? '' : b.dataset.year!; apply(); }));
+  document.querySelectorAll('#clear, [data-clear]').forEach((b) => b.addEventListener('click', () => { Object.assign(state, { who: 'all', year: '', type: 'all', q: '' }); apply(); }));
+
+  // Copy BibTeX
+  document.querySelectorAll<HTMLButtonElement>('.copy[data-bibtex]').forEach((b) => {
+    b.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(b.dataset.bibtex ?? '');
+        const old = b.textContent;
+        b.textContent = 'Copied';
+        setTimeout(() => (b.textContent = old), 1500);
+      } catch {
+        b.textContent = 'Copy failed';
+      }
+    });
+  });
+
+  apply();
+</script>
+
+<style>
+  .src { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+  .controls { padding-top: 48px; padding-bottom: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .row { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+  .row.between { justify-content: space-between; }
+  #q { flex: 1 1 320px; min-width: 0; min-height: 48px; border: 2px solid var(--ink); border-radius: 12px; padding: 0 16px; font: 500 16px var(--body); background: var(--paper); color: var(--ink); box-shadow: var(--shadow-sm); }
+  .pills { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pill { min-height: 44px; padding: 0 18px; border: 2px solid var(--ink); border-radius: 999px; font: 600 15px/1 var(--body); cursor: pointer; background: var(--paper); color: var(--ink); }
+  .pill:hover { background: var(--cyan-soft); }
+  .pill.is-on { background: var(--ink); color: #fff; }
+  .typesel select { min-height: 44px; padding: 0 14px; border: 2px solid var(--ink); border-radius: 999px; font: 600 15px var(--body); background: var(--paper); color: var(--ink); cursor: pointer; }
+  .chart { padding: 24px 24px 16px; display: flex; flex-direction: column; gap: 12px; }
+  .chart-head { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; align-items: baseline; }
+  .chart-head strong { font: 700 18px/1 var(--display); }
+  .bars { display: flex; align-items: flex-end; gap: 6px; height: 120px; }
+  .bar { flex: 1 1 0; min-width: 0; border: 2px solid var(--ink); border-radius: 6px 6px 0 0; background: var(--cyan); cursor: pointer; padding: 0; height: 6px; transition: background 0.12s; }
+  .bar.h0 { background: var(--paper); }
+  .bar:hover { background: var(--ink); }
+  .bar.is-on { background: var(--ink); }
+  .bar.h1 { height: 14px; } .bar.h2 { height: 22px; } .bar.h3 { height: 31px; } .bar.h4 { height: 40px; }
+  .bar.h5 { height: 49px; } .bar.h6 { height: 58px; } .bar.h7 { height: 67px; } .bar.h8 { height: 76px; }
+  .bar.h9 { height: 85px; } .bar.h10 { height: 94px; } .bar.h11 { height: 103px; } .bar.h12 { height: 112px; }
+  .axis { display: flex; gap: 6px; }
+  .axis span { flex: 1 1 0; min-width: 0; text-align: center; font-size: 10px; }
+  .count { font-weight: 600; }
+  .listwrap { padding-bottom: 96px; }
+  .publist { margin: 0; padding: 0; border-bottom: 2px solid var(--ink); }
+  .empty { padding: 32px 0; font-size: 18px; }
+  @media (max-width: 640px) {
+    .axis span:nth-child(even) { visibility: hidden; }
+    .src { align-items: flex-start; }
+  }
+</style>

@@ -1,0 +1,20 @@
+{
+  "members": [
+    {
+      "slug": "alfredo-benso",
+      "name": "Alfredo Benso",
+      "short": "Benso",
+      "polito": "alfredo.benso",
+      "iris": "rp06317",
+      "orcid": "0000-0003-3433-7739"
+    },
+    {
+      "slug": "gianfranco-politano",
+      "name": "Gianfranco Politano",
+      "short": "Politano",
+      "polito": "gianfranco.politano",
+      "iris": "rp21564",
+      "orcid": "0000-0001-5268-9899"
+    }
+  ]
+}

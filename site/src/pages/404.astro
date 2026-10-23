@@ -1,0 +1,22 @@
+---
+import Base from '../layouts/Base.astro';
+import { href } from '../lib/site';
+---
+<Base title="Page not found" description="This page does not exist.">
+  <section class="wrap nf">
+    <span class="chip bg-coral">404</span>
+    <h1>That node is not in the network.</h1>
+    <p>The page you asked for does not exist, or it lived on our old WordPress site.</p>
+    <div class="cta">
+      <a href={href('/')} class="btn btn-violet">Back home</a>
+      <a href={href('/publications/')} class="btn">Publications</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf { padding: 96px var(--gutter) 128px; display: flex; flex-direction: column; gap: 24px; align-items: flex-start; }
+  h1 { font-size: clamp(40px, 5vw, 64px); }
+  p { font-size: 18px; }
+  .cta { display: flex; gap: 16px; flex-wrap: wrap; }
+</style>

@@ -1,0 +1,176 @@
+[
+  {
+    "slug": "alfredo-benso",
+    "name": "Alfredo Benso",
+    "short": "Benso",
+    "polito": {
+      "role": "Full Professor (L. 240)",
+      "department": "Department of Control and Computer Engineering (DAUIN)",
+      "center": "PolitoBIOMed Lab - Biomedical Engineering Lab",
+      "phone": "+390110907054",
+      "email": "alfredo.benso@polito.it",
+      "keywords": [
+        "Biological database systems",
+        "Biological networks",
+        "Biostatistics",
+        "Gene regulatory networks",
+        "Molecular modeling",
+        "artificial intelligence",
+        "machine learning",
+        "pathology dynamics",
+        "health",
+        "multiscale modeling",
+        "multi physics modeling"
+      ],
+      "links": {
+        "orcid": "https://orcid.org/0000-0003-3433-7739"
+      },
+      "projects": [
+        {
+          "acronym": "BIGMECH",
+          "title": "Knowledge-generation framework combining a novel Biomimetic Investigation platform and hiGh throughput screening for unravelling bone MECHanotransduction mechanisms in view of precision orthopedic medicine",
+          "start": 2023,
+          "end": 2025,
+          "role": "Responsabile Scientifico di Struttura",
+          "funding": "Nationally funded research - PRIN",
+          "kind": "Projects funded by competitive calls"
+        },
+        {
+          "acronym": "FISHUB",
+          "title": "Topic 4: Rapid, on-site, cost-effective methods for feed/food fraud detection",
+          "start": 2016,
+          "end": 2018,
+          "role": "Responsabile Scientifico",
+          "funding": "UE-funded research",
+          "kind": "Projects funded by competitive calls"
+        },
+        {
+          "acronym": "MAESS",
+          "title": "DEVELOPMENT OF STANDARDIZED MODULAR PLATFORM FOR LOW-COST NANO AND MICRO SATELLITES AND APPLICATIONS TO LOW-COST SPACE MISSIONS AND TO GALILEO",
+          "start": 2007,
+          "end": 2011,
+          "role": "Responsabile Scientifico",
+          "funding": "Regionally funded research",
+          "kind": "Projects funded by competitive calls"
+        },
+        {
+          "acronym": "",
+          "title": "SOLUZIONI SOFTWARE PER SISTEMI DIGITALI AFFIDABILI IN APPLICAZIONI SPAZIALI",
+          "start": 2006,
+          "end": 2008,
+          "role": "Responsabile Scientifico",
+          "funding": "Regionally funded research",
+          "kind": "Projects funded by competitive calls"
+        }
+      ],
+      "researchLines": [],
+      "erc": [
+        "PE6_7 - Artificial intelligence, intelligent systems, multi agent systems",
+        "LS2_10 - Bioinformatics",
+        "PE6_13 - Bioinformatics, biocomputing, and DNA and molecular computation",
+        "LS2_14 - Biological systems analysis, modelling and simulation",
+        "LS7_2 - Diagnostic tools (e.g. genetic, imaging)",
+        "LS2_1 - Genomics, comparative genomics, functional genomics",
+        "LS7_8 - Health services, health care research",
+        "PE6_11 - Machine learning, statistical data processing and applications using signal processing (e.g. speech, image, video)",
+        "LS7_1 - Medical engineering and technology",
+        "LS7_9 - Public health and epidemiology",
+        "LS2_13 - Systems biology",
+        "PE6_10 - Web and information systems, database systems, information retrieval and digital libraries, data fusion"
+      ],
+      "sdg": [
+        "Goal 3: Good health and well-being",
+        "Goal 4: Quality education"
+      ],
+      "url": "https://www.polito.it/en/staff?p=alfredo.benso"
+    },
+    "orcid": "0000-0003-3433-7739",
+    "iris": "https://iris.polito.it/cris/rp/rp06317",
+    "counts": {
+      "iris": 157,
+      "orcidOnly": 5
+    }
+  },
+  {
+    "slug": "gianfranco-politano",
+    "name": "Gianfranco Politano",
+    "short": "Politano",
+    "polito": {
+      "role": "Associate Professor (L. 240)",
+      "department": "Department of Control and Computer Engineering (DAUIN)",
+      "center": "",
+      "phone": "+390110907198",
+      "email": "gianfranco.politano@polito.it",
+      "keywords": [
+        "Bioinformatics",
+        "Circulating microrna",
+        "Deep learning",
+        "Gene regulatory networks",
+        "Microrna",
+        "Multivariate statistics",
+        "Systems biology"
+      ],
+      "links": {
+        "orcid": "https://orcid.org/0000-0001-5268-9899",
+        "scopus": "https://www.scopus.com/authid/detail.uri?authorId=26655038700",
+        "google_scholar": "https://scholar.google.com/citations?user=oC-BGgUAAAAJ",
+        "researchgate": "https://www.researchgate.net/profile/Gianfranco_Politano2",
+        "linkedin": "https://www.linkedin.com/in/gianfrancopolitano"
+      },
+      "projects": [
+        {
+          "acronym": "DIDES",
+          "title": "DIDEs: Database Italiano Diagnostica animali Esotici",
+          "start": 2020,
+          "end": 2020,
+          "role": "Responsabile Scientifico",
+          "funding": "National Research",
+          "kind": "Projects funded by competitive calls"
+        },
+        {
+          "acronym": "",
+          "title": "Evaluation of Large Language Models for Automated HAI Case Definition Matching for Surveillance",
+          "start": 2026,
+          "end": 2026,
+          "role": "Responsabile Scientifico",
+          "funding": "Commercial Research",
+          "kind": "Projects funded by commercial contracts"
+        },
+        {
+          "acronym": "",
+          "title": "Sviluppo congiunto di uno studio di fattibilità in supporto alle attività di R&S per il miglioramento delle capacità di diagnosi e stadiazione ecografica del cancro del retto",
+          "start": 2021,
+          "end": 2021,
+          "role": "Responsabile Scientifico",
+          "funding": "Consulting",
+          "kind": "Projects funded by commercial contracts"
+        }
+      ],
+      "researchLines": [],
+      "erc": [
+        "PE6_7 - Artificial intelligence, intelligent systems, multi agent systems",
+        "LS2_10 - Bioinformatics",
+        "PE6_13 - Bioinformatics, biocomputing, and DNA and molecular computation",
+        "LS2_14 - Biological systems analysis, modelling and simulation",
+        "LS2_12 - Biostatistics",
+        "LS2_11 - Computational biology",
+        "LS2_8 - Epigenetics and gene regulation",
+        "PE6_11 - Machine learning, statistical data processing and applications using signal processing (e.g. speech, image, video)",
+        "LS2_3 - Proteomics",
+        "PE1_14 - Statistics",
+        "LS2_13 - Systems biology",
+        "PE6_10 - Web and information systems, database systems, information retrieval and digital libraries, data fusion"
+      ],
+      "sdg": [
+        "Goal 3: Good health and well-being"
+      ],
+      "url": "https://www.polito.it/en/staff?p=gianfranco.politano"
+    },
+    "orcid": "0000-0001-5268-9899",
+    "iris": "https://iris.polito.it/cris/rp/rp21564",
+    "counts": {
+      "iris": 103,
+      "orcidOnly": 0
+    }
+  }
+]
