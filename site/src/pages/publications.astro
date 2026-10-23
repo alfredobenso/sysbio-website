@@ -57,7 +57,10 @@ const synced = new Date(meta.fetchedAt).toLocaleDateString('en-GB', { day: 'nume
       </div>
       <div class="bars" role="group" aria-label="Filter by year">
         {allYears.map((y) => (
-          <button type="button" class:list={['bar', `h${step(counts.get(y) ?? 0)}`]} data-year={y} aria-pressed="false" aria-label={`${y}: ${counts.get(y) ?? 0} papers`} title={`${y}: ${counts.get(y) ?? 0}`}></button>
+          <div class="col">
+            <span class="n mono" aria-hidden="true">{counts.get(y) || ''}</span>
+            <button type="button" class:list={['bar', `h${step(counts.get(y) ?? 0)}`]} data-year={y} aria-pressed="false" aria-label={`${y}: ${counts.get(y) ?? 0} papers`} title={`${y}: ${counts.get(y) ?? 0}`}></button>
+          </div>
         ))}
       </div>
       <div class="axis mono">
@@ -161,8 +164,10 @@ const synced = new Date(meta.fetchedAt).toLocaleDateString('en-GB', { day: 'nume
   .chart { padding: 24px 24px 16px; display: flex; flex-direction: column; gap: 12px; }
   .chart-head { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; align-items: baseline; }
   .chart-head strong { font: 700 18px/1 var(--display); }
-  .bars { display: flex; align-items: flex-end; gap: 6px; height: 120px; }
-  .bar { flex: 1 1 0; min-width: 0; border: 2px solid var(--ink); border-radius: 6px 6px 0 0; background: var(--cyan); cursor: pointer; padding: 0; height: 6px; transition: background 0.12s; }
+  .bars { display: flex; align-items: flex-end; gap: 6px; height: 140px; }
+  .col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: stretch; justify-content: flex-end; gap: 4px; }
+  .n { text-align: center; font-size: 11px; line-height: 1; color: var(--muted); }
+  .bar { width: 100%; border: 2px solid var(--ink); border-radius: 6px 6px 0 0; background: var(--cyan); cursor: pointer; padding: 0; height: 6px; transition: background 0.12s; }
   .bar.h0 { background: var(--paper); }
   .bar:hover { background: var(--ink); }
   .bar.is-on { background: var(--ink); }
@@ -177,6 +182,7 @@ const synced = new Date(meta.fetchedAt).toLocaleDateString('en-GB', { day: 'nume
   .empty { padding: 32px 0; font-size: 18px; }
   @media (max-width: 640px) {
     .axis span:nth-child(even) { visibility: hidden; }
+    .n { display: none; }
     .src { align-items: flex-start; }
   }
 </style>
