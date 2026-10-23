@@ -15,10 +15,11 @@ const { title, description, current, accent, fullFooter = false } = Astro.props;
 const fullTitle = title === 'SysBio Group' ? 'SysBio Group · Politecnico di Torino' : `${title} · SysBio Group`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 
-// Content-Security-Policy as a meta tag so it also applies on hosts that
-// cannot set response headers (GitHub Pages). public/_headers carries the
-// same policy, plus frame-ancestors, for hosts that can.
-const csp = [
+// Content-Security-Policy as a meta tag so it also applies on hosts that set
+// no response headers. public/.htaccess and public/_headers carry the same
+// policy, plus frame-ancestors. Only in production builds: `astro dev` injects
+// inline styles and scripts for hot reload, which this policy would block.
+const csp = import.meta.env.PROD ? [
   "default-src 'none'",
   "script-src 'self'",
   "style-src 'self'",
@@ -27,14 +28,14 @@ const csp = [
   "connect-src 'self'",
   "base-uri 'none'",
   "form-action 'none'",
-].join('; ');
+].join('; ') : '';
 ---
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta http-equiv="Content-Security-Policy" content={csp} />
+    {csp && <meta http-equiv="Content-Security-Policy" content={csp} />}
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
