@@ -6,7 +6,9 @@ const people = defineCollection({
   schema: z.object({
     name: z.string(),
     title: z.string(), // short role line shown under the name
-    photo: z.string(),
+    kind: z.enum(['faculty', 'member']).default('faculty'), // faculty: profile synced from polito.it
+    period: z.string().optional(), // e.g. "2026", shown for members
+    photo: z.string().optional(),
     accent: z.string().default('violet'),
     order: z.number().default(99),
     links: z.record(z.string().url()).default({}),

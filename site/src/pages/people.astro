@@ -6,7 +6,8 @@ import meta from '../data/meta.json';
 import { href } from '../lib/site';
 
 const entries = (await getCollection('people')).sort((a, b) => a.data.order - b.data.order);
-const people = await Promise.all(entries.map(async (e) => {
+const members = await Promise.all(entries.filter((e) => e.data.kind === 'member').map(async (e) => ({ ...e, Content: (await render(e)).Content })));
+const people = await Promise.all(entries.filter((e) => e.data.kind === 'faculty').map(async (e) => {
   const live = peopleData.find((p) => p.slug === e.id);
   const { Content } = await render(e);
   const links: Record<string, string> = {
@@ -43,7 +44,7 @@ const alumni = [
   <section class="wrap faculty" aria-label="Faculty">
     {people.map((p) => (
       <article class="card person" id={p.id}>
-        <img src={href(p.data.photo)} alt={`Portrait of ${p.data.name}`} width="220" height="260" class:list={['photo', `shadow-${p.data.accent}`]} loading="lazy" />
+        <img src={href(p.data.photo ?? '/img/placeholder.svg')} alt={`Portrait of ${p.data.name}`} width="220" height="260" class:list={['photo', `shadow-${p.data.accent}`]} loading="lazy" />
         <div class="info">
           <div>
             <h2>{p.data.name}</h2>
@@ -71,6 +72,33 @@ const alumni = [
       </article>
     ))}
   </section>
+
+  {members.length > 0 && (
+    <section class="wrap section" aria-labelledby="members-h">
+      <div class="section-head">
+        <h2 id="members-h">Research fellows &amp; students</h2>
+      </div>
+      <div class="grid-2">
+        {members.map((m) => (
+          <article class="card member" id={m.id}>
+            <div class:list={['avatar', `bg-${m.data.accent}`]} aria-hidden="true">{m.data.name.split(/\s+/).map((w) => w[0]).join('')}</div>
+            <div class="info">
+              <div>
+                <h3>{m.data.name}</h3>
+                <p class="role">{m.data.title}{m.data.period ? ` · ${m.data.period}` : ''}</p>
+              </div>
+              <div class="prose"><m.Content /></div>
+              {Object.keys(m.data.links).length > 0 && (
+                <div class="links">
+                  {Object.entries(m.data.links).map(([k, u]) => <a class="small" href={u} target="_blank" rel="noopener">{linkLabel[k] ?? k}</a>)}
+                </div>
+              )}
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
 
   <section class="wrap section" aria-labelledby="alumni-h">
     <div class="section-head">
@@ -106,6 +134,10 @@ const alumni = [
   .role { font-size: 17px; font-weight: 600; margin-top: 6px; }
   .kw { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; }
   .links { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 4px; }
+  .member { display: flex; gap: 24px; padding: 24px; }
+  .avatar { flex: 0 0 72px; width: 72px; height: 72px; border: 2px solid var(--ink); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font: 700 26px/1 var(--display); letter-spacing: -0.02em; }
+  .member h3 { font-size: 26px; }
+  .member .role { font-size: 15px; }
   .alumni { list-style: none; margin: 0; padding: 0; gap: 16px; }
   .alumni .tile { padding: 18px 20px; font-size: 14px; }
   .alumni strong { font-size: 16px; }
