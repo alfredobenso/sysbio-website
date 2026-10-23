@@ -69,6 +69,11 @@ const alumni = [
             ))}
             <a class="small" href={href(`/publications/?who=${p.id}`)}>{p.pubCount} publications</a>
           </div>
+          {p.data.offDuty && (
+            <p class="offduty"><span class="mono">off duty</span> {p.data.offDuty.intro}{p.data.offDuty.links.map((l, i) => (
+              <>{i === 0 ? ' ' : ' · '}<a href={l.url} target="_blank" rel="noopener">{l.label}</a></>
+            ))}</p>
+          )}
         </div>
       </article>
     ))}
@@ -139,6 +144,8 @@ const alumni = [
   .role { font-size: 17px; font-weight: 600; margin-top: 6px; }
   .kw { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; }
   .links { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 4px; }
+  .offduty { font-size: 14px; color: var(--muted); }
+  .offduty .mono { color: var(--coral); margin-right: 6px; }
   .member { display: flex; gap: 24px; padding: 24px; }
   .avatar { flex: 0 0 72px; width: 72px; height: 72px; border: 2px solid var(--ink); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font: 700 26px/1 var(--display); letter-spacing: -0.02em; }
   .member h3 { font-size: 26px; }

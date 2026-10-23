@@ -12,6 +12,8 @@ const people = defineCollection({
     accent: z.string().default('violet'),
     order: z.number().default(99),
     links: z.record(z.string().url()).default({}),
+    // a light personal note, e.g. a sport, with optional links
+    offDuty: z.object({ intro: z.string(), links: z.array(z.object({ label: z.string(), url: z.string().url() })).default([]) }).optional(),
   }),
 });
 
