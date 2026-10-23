@@ -7,7 +7,7 @@ import { href } from '../lib/site';
 
 const entries = (await getCollection('people')).sort((a, b) => a.data.order - b.data.order);
 const members = await Promise.all(entries.filter((e) => e.data.kind === 'member').map(async (e) => ({ ...e, Content: (await render(e)).Content })));
-const people = await Promise.all(entries.filter((e) => e.data.kind === 'faculty').map(async (e) => {
+const people = await Promise.all(entries.filter((e) => e.data.kind !== 'member').map(async (e) => {
   const live = peopleData.find((p) => p.slug === e.id);
   const { Content } = await render(e);
   const links: Record<string, string> = {
@@ -21,13 +21,14 @@ const people = await Promise.all(entries.filter((e) => e.data.kind === 'faculty'
 
 const linkLabel: Record<string, string> = { orcid: 'ORCID', scopus: 'Scopus', google_scholar: 'Google Scholar', researchgate: 'ResearchGate', linkedin: 'LinkedIn', dblp: 'dblp' };
 
+// Hand-maintained: what they did with us, and where they are now (checked Oct 2026).
 const alumni = [
-  ['Stefano Di Carlo', 'co-author on theRING, CyTransfinder, ReNE, PPL Finder'],
-  ['Alessandro Savino', 'regulatory network models, protein function prediction'],
-  ['Roberta Bardini', 'multi-level models, BiSDL, co-inventor of two patents'],
-  ['Hafeez Ur Rehman', 'PhD · PFP pipeline, protein function prediction'],
-  ['Alessandro Vasciaveo', 'PhD · BNToolkit, Boolean network simulation'],
-  ['Massimo Natale', 'FunMOD, protein–protein network modules'],
+  { name: 'Stefano Di Carlo', was: 'co-author on theRING, CyTransfinder, ReNE, PPL Finder', now: 'Full Professor, DAUIN, Politecnico di Torino', url: 'https://www.polito.it/en/staff?p=stefano.dicarlo' },
+  { name: 'Alessandro Savino', was: 'regulatory network models, protein function prediction', now: 'Associate Professor, DAUIN, Politecnico di Torino', url: 'https://www.polito.it/en/staff?p=alessandro.savino' },
+  { name: 'Roberta Bardini', was: 'PhD 2019 · multi-level models, BiSDL, co-inventor of two patents', now: 'Assistant Professor, DAUIN, Politecnico di Torino', url: 'https://www.polito.it/en/staff?p=roberta.bardini' },
+  { name: 'Hafeez Ur Rehman', was: 'PhD 2014 · PFP pipeline, protein function prediction', now: 'Dean, College of Computing and Data Science, Oryx University, Doha', url: 'https://oryx.edu.qa/about/staff-profiles/hafeez-ur-rehman/' },
+  { name: 'Alessandro Vasciaveo', was: 'PhD 2017 · BNToolkit, Boolean network simulation', now: 'Assistant Professor of Computational Biology & AI, Sanford Burnham Prebys, San Diego', url: 'https://sbpdiscovery.org/scientists/alessandro-vasciaveo-phd/' },
+  { name: 'Massimo Natale', was: 'PhD · FunMOD, protein–protein network modules', now: 'Head of Data & Analytics, Generali Italia', url: 'https://www.linkedin.com/in/massimonatale/' },
 ];
 ---
 <Base title="People" description="The people of the SysBio Group at Politecnico di Torino: Alfredo Benso and Gianfranco Politano, with alumni and collaborators." current="/people/" accent="coral">
@@ -105,8 +106,12 @@ const alumni = [
       <h2 id="alumni-h">Alumni &amp; long-time collaborators</h2>
     </div>
     <ul class="grid-3 alumni">
-      {alumni.map(([name, what]) => (
-        <li class="tile"><strong>{name}</strong><br /><span class="muted">{what}</span></li>
+      {alumni.map((a) => (
+        <li class="tile alum">
+          <a href={a.url} target="_blank" rel="noopener"><strong>{a.name}</strong></a>
+          <span class="muted">{a.was}</span>
+          <span class="now"><span class="mono">now</span> {a.now}</span>
+        </li>
       ))}
     </ul>
   </section>
@@ -139,8 +144,12 @@ const alumni = [
   .member h3 { font-size: 26px; }
   .member .role { font-size: 15px; }
   .alumni { list-style: none; margin: 0; padding: 0; gap: 16px; }
-  .alumni .tile { padding: 18px 20px; font-size: 14px; }
+  .alumni .tile { padding: 18px 20px; font-size: 14px; display: flex; flex-direction: column; gap: 6px; }
   .alumni strong { font-size: 16px; }
+  .alumni a { text-decoration: none; }
+  .alumni a:hover strong { text-decoration: underline; text-decoration-thickness: 2px; }
+  .now { padding-top: 4px; border-top: 2px dotted var(--line); }
+  .now .mono { margin-right: 6px; color: var(--coral); }
   .join { padding: 40px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 8px; }
   .join h2 { font-size: 32px; line-height: 1.1; margin-bottom: 10px; }
   .join div { max-width: 640px; }
