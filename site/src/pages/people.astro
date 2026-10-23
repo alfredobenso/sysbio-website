@@ -122,7 +122,7 @@ const alumni = [
         <h2>Looking for a collaborator in computational biology?</h2>
         <p>We bring the computational side to wet-lab and clinical partners: data integration, network models, and machine learning that is honest about its uncertainty. Joint papers, grant proposals and student exchanges all welcome.</p>
       </div>
-      <a href="#contact" class="btn btn-ink">Start a conversation</a>
+      <a href={`mailto:${peopleData[0]?.polito?.email ?? 'alfredo.benso@polito.it'}?subject=${encodeURIComponent('Collaboration with the SysBio Group')}`} class="btn btn-ink">Write to Alfredo Benso</a>
     </div>
   </section>
 </Base>
