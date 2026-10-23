@@ -54,6 +54,16 @@ const csp = import.meta.env.PROD ? [
       <slot />
     </main>
     <Footer full={fullFooter} />
+    <script>
+      // Rebuild obfuscated email links (see components/Email.astro).
+      const rev = (s: string) => [...s].reverse().join('');
+      document.querySelectorAll<HTMLAnchorElement>('a.eml[data-u][data-d]').forEach((a) => {
+        const addr = `${rev(a.dataset.u!)}@${rev(a.dataset.d!)}`;
+        a.href = `mailto:${addr}${a.dataset.s ? `?subject=${encodeURIComponent(a.dataset.s)}` : ''}`;
+        const t = a.querySelector('.eml-text');
+        if (t && !a.dataset.keep) t.textContent = addr;
+      });
+    </script>
   </body>
 </html>
 

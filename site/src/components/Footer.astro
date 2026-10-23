@@ -2,6 +2,7 @@
 import people from '../data/people.json';
 import meta from '../data/meta.json';
 import { href } from '../lib/site';
+import Email from './Email.astro';
 
 interface Props { full?: boolean }
 const { full = false } = Astro.props;
@@ -15,7 +16,7 @@ const synced = new Date(meta.fetchedAt).toLocaleDateString('en-GB', { day: 'nume
           <strong class="h">Work with us</strong>
           <p>We supervise MSc theses and PhD projects in bioinformatics, systems biology and AI for health, and we bring the computational side to wet-lab and clinical partners. Write to either of us.</p>
           {people.map((p) => p.polito?.email && (
-            <a class="mail" href={`mailto:${p.polito.email}`}>{p.polito.email}</a>
+            <Email class="mail" email={p.polito.email} />
           ))}
         </div>
         <div class="col">
@@ -48,7 +49,8 @@ const synced = new Date(meta.fetchedAt).toLocaleDateString('en-GB', { day: 'nume
   .h { color: #fff; font: 700 26px/1.1 var(--display); letter-spacing: -0.02em; }
   .col a { color: #fff; }
   .col a:hover { color: var(--lime); }
-  .mail { color: var(--lime) !important; font-weight: 600; }
+  .mail { color: var(--lime) !important; font-weight: 600; text-decoration: none; }
+  .mail:hover { text-decoration: underline; }
   .bottom { display: flex; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; color: var(--faint); }
   @media (max-width: 800px) { .cols { grid-template-columns: minmax(0, 1fr); gap: 28px; } }
 </style>

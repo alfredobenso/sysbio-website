@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import Email from '../components/Email.astro';
 import peopleData from '../data/people.json';
 import meta from '../data/meta.json';
 import { href } from '../lib/site';
@@ -59,10 +60,9 @@ const alumni = [
           ) : null}
           <div class="links">
             {p.live?.polito?.email && (
-              <a class="small" href={`mailto:${p.live.polito.email}`}>
+              <Email class="small" email={p.live.polito.email}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 7l9 6 9-6" /></svg>
-                {p.live.polito.email}
-              </a>
+              </Email>
             )}
             {Object.entries(p.links).filter(([, u]) => u).map(([k, u]) => (
               <a class="small" href={u} target="_blank" rel="noopener">{linkLabel[k] ?? k}</a>
@@ -122,7 +122,7 @@ const alumni = [
         <h2>Looking for a collaborator in computational biology?</h2>
         <p>We bring the computational side to wet-lab and clinical partners: data integration, network models, and machine learning that is honest about its uncertainty. Joint papers, grant proposals and student exchanges all welcome.</p>
       </div>
-      <a href={`mailto:${peopleData[0]?.polito?.email ?? 'alfredo.benso@polito.it'}?subject=${encodeURIComponent('Collaboration with the SysBio Group')}`} class="btn btn-ink">Write to Alfredo Benso</a>
+      <Email class="btn btn-ink" email={peopleData[0]?.polito?.email ?? 'alfredo.benso@polito.it'} subject="Collaboration with the SysBio Group" label="Write to Alfredo Benso" />
     </div>
   </section>
 </Base>

@@ -1,0 +1,14 @@
+---
+// Obfuscated email link: the HTML never contains "mailto:" or "user@domain".
+// The address is stored reversed, in two halves; the script in Base.astro
+// rebuilds the real mailto: link in the browser. Without JavaScript the link
+// still shows "user [at] domain", readable by a person.
+interface Props { email: string; subject?: string; label?: string; class?: string }
+const { email, subject, label, class: cls } = Astro.props;
+const [user, domain] = email.split('@');
+const rev = (s: string) => [...s].reverse().join('');
+---
+<a href="#" class:list={['eml', cls]} data-u={rev(user)} data-d={rev(domain)} data-s={subject} data-keep={label ? '1' : undefined} title="Send an email">
+  <slot />
+  <span class="eml-text">{label ?? <>{user}<span class="eml-at"> [at] </span><span>{domain}</span></>}</span>
+</a>
