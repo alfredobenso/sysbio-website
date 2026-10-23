@@ -13,7 +13,24 @@ Static site for the Systems Biology Group, Politecnico di Torino. Built with [As
 | add a member | add them to `scripts/sources.json` (polito.it id, IRIS `rp` id, ORCID) and a `src/content/people/<slug>.md` |
 | change text that is not in Markdown | `src/pages/*.astro` |
 
-Commit and push to `main`: GitHub Actions rebuilds and deploys.
+Commit and push to `main`: GitHub Actions rebuilds (see Hosting).
+
+## Hosting on the Politecnico server
+
+GitHub Actions does not deploy anywhere. On every push and every night it builds the site and publishes the result in two places:
+
+- the **`build` branch** of the repository, which contains only the built files (`dist/`);
+- a downloadable **artifact** on the workflow run (Actions tab).
+
+On the server, serve the `build` branch as the document root and refresh it on a cron job:
+
+```
+git clone -b build --single-branch https://github.com/<owner>/<repo>.git /var/www/sysbio
+# then, e.g. hourly:
+cd /var/www/sysbio && git pull -q
+```
+
+`public/.htaccess` (copied into the build) sets the security headers and the 404 page for Apache. If the server runs nginx, copy the headers from `public/_headers` into the server block instead. Turn on the `Strict-Transport-Security` line once HTTPS is live on the final domain.
 
 ## Data that is fetched, not written
 
@@ -31,7 +48,7 @@ Everything fetched is treated as untrusted text: tags are stripped, lengths capp
 
 - Fully static: nothing to log into, no PHP, no database, no forms.
 - Strict Content-Security-Policy (`default-src 'none'`, scripts and styles only from this origin). The build is configured so Astro never inlines scripts or styles (`astro.config.mjs`), and Markdown code blocks are not syntax-highlighted for the same reason. Do not add inline `style=""` attributes or `<script>` without `src` in templates.
-- `public/_headers` carries the full header set for Cloudflare Pages / Netlify; the same CSP is also in a `<meta>` tag for GitHub Pages.
+- `public/.htaccess` (Apache) and `public/_headers` (Cloudflare/Netlify style) carry the full header set; the same CSP is also in a `<meta>` tag in every page, so it holds even on a host that sets no headers.
 - Fonts are self-hosted (`@fontsource/*`); no third-party requests at runtime, no cookies, no analytics.
 
 ## Commands
@@ -44,4 +61,4 @@ npm run build      # → dist/
 npm run preview
 ```
 
-`SITE_BASE=/sysbio npm run build` builds for a sub-path (e.g. a `user.github.io/sysbio` page before the DNS switch); set the `SITE_BASE` repository variable in GitHub for the same effect in CI.
+`SITE_BASE=/sub/path npm run build` builds for a sub-path if the site is ever served from one.
