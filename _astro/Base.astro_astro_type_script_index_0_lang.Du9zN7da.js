@@ -1,0 +1,1 @@
+var e=e=>[...e].reverse().join(``);document.querySelectorAll(`a.eml[data-u][data-d]`).forEach(t=>{let n=`${e(t.dataset.u)}@${e(t.dataset.d)}`;t.href=`mailto:${n}${t.dataset.s?`?subject=${encodeURIComponent(t.dataset.s)}`:``}`;let r=t.querySelector(`.eml-text`);r&&!t.dataset.keep&&(r.textContent=n)});
